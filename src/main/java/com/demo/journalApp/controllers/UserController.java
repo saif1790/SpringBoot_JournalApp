@@ -84,8 +84,8 @@ public class UserController {
         User userInDB = userService.findByUserName(userName);
         /*userInDB.setUserName(user.getUserName());
         userInDB.setPassword(user.getPassword());*/
-        userService.updateUser(userInDB);
+        User updatedUser = userService.updateUser(user);
         //userService.createEntry(userInDB);
-        return new ResponseEntity<>("User with name " + userInDB.getUserName(), HttpStatus.OK);
+        return new ResponseEntity<>("User with name " + updatedUser, HttpStatus.OK);
     }
 }
