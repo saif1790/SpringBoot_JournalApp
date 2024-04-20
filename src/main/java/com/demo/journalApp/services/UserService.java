@@ -72,4 +72,16 @@ public class UserService {
             return savedEntry;
         }
     }
+
+    public User createAdmin(User user) {
+        user.setUserName(user.getUserName());
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRoles(Arrays.asList("ADMIN","USER"));
+        User savedEntry = userRepository.save(user);
+        if (savedEntry != null) {
+            return savedEntry;
+        } else {
+            return savedEntry;
+        }
+    }
 }

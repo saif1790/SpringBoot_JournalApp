@@ -38,6 +38,7 @@ public class SpringSecurity {
         http.csrf().disable()
                 .authorizeHttpRequests()
                 .requestMatchers("/journal/**", "/user/**").authenticated()
+                .requestMatchers("/admin/**").hasRole("ADMIN")
                 .and().httpBasic()
                 .and()
                 .authorizeHttpRequests()
