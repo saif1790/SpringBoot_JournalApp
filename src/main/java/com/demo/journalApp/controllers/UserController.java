@@ -88,4 +88,18 @@ public class UserController {
         //userService.createEntry(userInDB);
         return new ResponseEntity<>("User with name " + updatedUser, HttpStatus.OK);
     }
+
+    @GetMapping("/findByUsername")
+    public ResponseEntity<?> findByUsername(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userName = authentication.getName();
+        User userInDb = userService.findByUserName(userName);
+        if(userInDb != null)
+        {
+            return new ResponseEntity<>(userInDb,HttpStatus.OK);
+        }
+        else {
+            return new ResponseEntity<>("User Not Found",HttpStatus.NOT_FOUND);
+        }
+    }
 }
