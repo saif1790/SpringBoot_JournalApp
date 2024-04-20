@@ -13,4 +13,5 @@ public interface UserRepository extends MongoRepository<User, ObjectId> {
     Optional<User> findById(ObjectId id);
 
     void deleteById(ObjectId id);
+
 }

@@ -3,6 +3,8 @@ package com.demo.journalApp.controllers;
 
 import com.demo.journalApp.entity.JournalEntry;
 import com.demo.journalApp.entity.User;
+import com.demo.journalApp.repository.JournalEntryRepository;
+import com.demo.journalApp.services.JournalEntryService;
 import com.demo.journalApp.services.UserService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +24,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private JournalEntryService journalEntryService;
 
     @GetMapping(path = "/getAllUsers")
     public ResponseEntity<List<User>> getAll() {
@@ -60,6 +66,23 @@ public class UserController {
         userService.deleteEntryById(myId);
         return new ResponseEntity("Entry has been deleted by :" + myId, HttpStatus.NO_CONTENT);
 
+    }
+
+
+    @DeleteMapping(path = "/deleteUserByUsername")
+    public ResponseEntity<?> deleteUserByUsername() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userName = authentication.getName();
+        User userInDB = userService.findByUserName(userName);
+        //userService.deleteUserByName(userName);
+        List<JournalEntry> journalEntries = userInDB.getJournalEntries();
+        for(JournalEntry journalEntry : journalEntries)
+        {
+            ObjectId id = journalEntry.getId();
+            journalEntryService.deleteEntryById(id,userName);
+        }
+        userService.deleteEntryById(userInDB.getId());
+        return new ResponseEntity("User has been deleted :", HttpStatus.NO_CONTENT);
     }
 
 
