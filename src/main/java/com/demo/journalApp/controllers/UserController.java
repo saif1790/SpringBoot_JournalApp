@@ -1,11 +1,14 @@
 package com.demo.journalApp.controllers;
 
 
+import com.demo.journalApp.api.response.WeatherResponse;
 import com.demo.journalApp.entity.JournalEntry;
 import com.demo.journalApp.entity.User;
 import com.demo.journalApp.repository.JournalEntryRepository;
 import com.demo.journalApp.services.JournalEntryService;
 import com.demo.journalApp.services.UserService;
+import com.demo.journalApp.services.WeatherService;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,6 +23,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping(path = "/user")
+@Slf4j
 public class UserController {
 
     @Autowired
@@ -27,6 +31,9 @@ public class UserController {
 
     @Autowired
     private JournalEntryService journalEntryService;
+
+    @Autowired
+    private WeatherService weatherService;
 
     @GetMapping(path = "/getAllUsers")
     public ResponseEntity<List<User>> getAll() {
@@ -124,5 +131,19 @@ public class UserController {
         else {
             return new ResponseEntity<>("User Not Found",HttpStatus.NOT_FOUND);
         }
+    }
+
+    @GetMapping("/{cityName}")
+    public ResponseEntity<?> greetingUser(@PathVariable String cityName ){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        log.info("User Name :" + authentication.getName());
+        WeatherResponse weatherResponse = weatherService.getWeather(cityName);
+        String greeting = "";
+        if(weatherResponse != null) {
+            greeting = "\n Region  :" + weatherResponse.getLocation().getRegion()+
+                    "\n Today temprature  :" + weatherResponse.getCurrent().getTempC() +
+                    "\n"+ "Last Temprature update at  :"+weatherResponse.getCurrent().getLastUpdated() + "\n";
+        }
+        return new ResponseEntity<>("Hi " + authentication.getName() +" " + greeting,HttpStatus.OK);
     }
 }
