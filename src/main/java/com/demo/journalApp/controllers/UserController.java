@@ -83,10 +83,9 @@ public class UserController {
         User userInDB = userService.findByUserName(userName);
         //userService.deleteUserByName(userName);
         List<JournalEntry> journalEntries = userInDB.getJournalEntries();
-        for(JournalEntry journalEntry : journalEntries)
-        {
+        for (JournalEntry journalEntry : journalEntries) {
             ObjectId id = journalEntry.getId();
-            journalEntryService.deleteEntryById(id,userName);
+            journalEntryService.deleteEntryById(id, userName);
         }
         userService.deleteEntryById(userInDB.getId());
         return new ResponseEntity("User has been deleted :", HttpStatus.NO_CONTENT);
@@ -120,30 +119,32 @@ public class UserController {
     }
 
     @GetMapping("/findByUsername")
-    public ResponseEntity<?> findByUsername(){
+    public ResponseEntity<?> findByUsername() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userName = authentication.getName();
         User userInDb = userService.findByUserName(userName);
-        if(userInDb != null)
-        {
-            return new ResponseEntity<>(userInDb,HttpStatus.OK);
-        }
-        else {
-            return new ResponseEntity<>("User Not Found",HttpStatus.NOT_FOUND);
+        if (userInDb != null) {
+            return new ResponseEntity<>(userInDb, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("User Not Found", HttpStatus.NOT_FOUND);
         }
     }
 
     @GetMapping("/{cityName}")
-    public ResponseEntity<?> greetingUser(@PathVariable String cityName ){
+    public ResponseEntity<?> greetingUser(@PathVariable String cityName) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         log.info("User Name :" + authentication.getName());
         WeatherResponse weatherResponse = weatherService.getWeather(cityName);
+        String text = weatherResponse.getCurrent().getCondition().getText();
         String greeting = "";
-        if(weatherResponse != null) {
-            greeting = "\n Region  :" + weatherResponse.getLocation().getRegion()+
-                    "\n Today temprature  :" + weatherResponse.getCurrent().getTempC() +
-                    "\n"+ "Last Temprature update at  :"+weatherResponse.getCurrent().getLastUpdated() + "\n";
+        if (weatherResponse != null) {
+            greeting = "\n Region  :" + weatherResponse.getLocation().getRegion() +
+                    "\n Today temprature  :" + weatherResponse.getCurrent().getTempC()+"\u00B0C"+
+                     "\nLast Temprature update at  :" + weatherResponse.getCurrent().getLastUpdated() +
+                    "\n Weather Type  : " + text + "\n Weather Icon  : " + weatherResponse.getCurrent().getCondition().getIcon() +
+                    "\n Wind Speed : " + weatherResponse.getCurrent().getWindKph()+" km/h"+
+                    "\n Humadity : " + weatherResponse.getCurrent().getHumidity()+"%";
         }
-        return new ResponseEntity<>("Hi " + authentication.getName() +" " + greeting,HttpStatus.OK);
+        return new ResponseEntity<>("Hi " + authentication.getName() + " " + greeting, HttpStatus.OK);
     }
 }
