@@ -21,6 +21,7 @@ public class AdminController {
     @GetMapping(path = "all-users")
     public ResponseEntity<?> getAllUsers()
     {
+        System.out.println("Hi User");
         List<User> listOfAllUsers = userService.getAllUsersEntries();
         if(listOfAllUsers != null && !listOfAllUsers.isEmpty())
         {
